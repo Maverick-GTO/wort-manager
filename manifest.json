@@ -1,15 +1,16 @@
 {
-  "name": "Wort-Manager",
-  "short_name": "Wörter",
+  "name": "Wort Sammler",
+  "short_name": "Sammler",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#4a90e2",
+  "background_color": "#121212",
+  "theme_color": "#121212",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3771/3771278.png",
+      "src": "https://img.icons8.com/m_rounded/512/FFFFFF/plus-math.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
