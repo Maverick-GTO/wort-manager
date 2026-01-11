@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+    <meta charset="UTF-8">
+    <title>Wort-Erfassungs-App v2</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; background-color: #f4f4f4; }
+        .hidden { display: none; }
+        .screen { background: white; border: 1px solid #ccc; padding: 20px; border-radius: 8px; max-width: 800px; margin: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        button { margin: 5px; cursor: pointer; padding: 10px 15px; border-radius: 4px; border: 1px solid #ddd; background: #eee; }
+        button:hover { background: #ddd; }
+        .btn-delete { background: #ffcccc; color: #a00; }
+        .btn-save { background: #ccffcc; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f8f8f8; }
+        textarea { width: 100%; padding: 10px; box-sizing: border-box; border-radius: 4px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+
+    <div id="home" class="screen">
+        <h1>Wort-Manager</h1>
+        <button onclick="showScreen('erfassen')">Erfassen von Wörtern oder Sätzen</button><br>
+        <button onclick="showScreen('ansehen')">Einträge ansehen</button><br>
+        <button onclick="showScreen('random')">Random</button>
+    </div>
+
+    <div id="erfassen" class="screen hidden">
+        <h2>Neu erfassen</h2>
+        <textarea id="inputField" rows="4" placeholder="Hier tippen..."></textarea><br>
+        <button class="btn-save" onclick="saveEntry('Wort')">Senden Wort</button>
+        <button class="btn-save" onclick="saveEntry('Satz')">Senden Satz</button>
+        <button onclick="showScreen('home')">Zurück</button>
+    </div>
+
+    <div id="ansehen" class="screen hidden">
+        <h2>Alle Einträge</h2>
+        <button onclick="exportCSV()">CSV Export (Excel)</button>
+        <button onclick="showScreen('home')">Zurück</button>
+        <div id="tableContainer"></div>
+    </div>
+
+    <div id="random" class="screen hidden">
+        <h2>Zufälliger Eintrag</h2>
+        <p id="randomDisplay" style="font-size: 1.5em; min-height: 50px; padding: 20px; border: 1px dashed #ccc;"></p>
+        <button onclick="displayRandom()">Next</button>
+        <button onclick="showScreen('home')">Back</button>
+    </div>
+
+    <script>
+        // Daten aus dem Speicher laden oder leeres Array erstellen
+        let entries = JSON.parse(localStorage.getItem('entries')) || [];
+
+        // Navigation zwischen den Seiten
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+            document.getElementById(screenId).classList.remove('hidden');
+            if (screenId === 'ansehen') renderTable();
+            if (screenId === 'random') displayRandom();
+        }
+
+        // Speichern eines neuen Eintrags
+        function saveEntry(type) {
+            const content = document.getElementById('inputField').value.trim();
+            if (!content) {
+                alert("Bitte Text eingeben!");
+                return;
+            }
+
+            const entry = {
+                datum: new Date().toLocaleString('de-CH'),
+                eintrag: content,
+                zeichen: content.length,
+                typ: type
+            };
+
+            entries.push(entry);
+            saveToLocalStorage();
+            document.getElementById('inputField').value = '';
+            alert('Eintrag gespeichert!');
+        }
+
+        // Daten dauerhaft im Browser speichern
+        function saveToLocalStorage() {
+            localStorage.setItem('entries', JSON.stringify(entries));
+        }
+
+        // Tabelle anzeigen inklusive Lösch-Button
+        function renderTable() {
+            if (entries.length === 0) {
+                document.getElementById('tableContainer').innerHTML = "<p>Keine Einträge vorhanden.</p>";
+                return;
+            }
+
+            let html = '<table><tr><th>Nr.</th><th>Datum</th><th>Eintrag</th><th>Zeichen</th><th>Typ</th><th>Aktion</th></tr>';
+            entries.forEach((e, index) => {
+                html += `<tr>
+                    <td>${index + 1}</td>
+                    <td>${e.datum}</td>
+                    <td>${e.eintrag}</td>
+                    <td>${e.zeichen}</td>
+                    <td>${e.typ}</td>
+                    <td><button class="btn-delete" onclick="deleteEntry(${index})">Löschen</button></td>
+                </tr>`;
+            });
+            html += '</table>';
+            document.getElementById('tableContainer').innerHTML = html;
+        }
+
+        // Einzelnen Eintrag löschen
+        function deleteEntry(index) {
+            if (confirm("Möchten Sie diesen Eintrag wirklich löschen?")) {
+                entries.splice(index, 1);
+                saveToLocalStorage();
+                renderTable();
+            }
+        }
+
+        // CSV Export Funktion
+        function exportCSV() {
+            if (entries.length === 0) {
+                alert("Keine Daten zum Exportieren vorhanden.");
+                return;
+            }
+
+            // Kopfzeile der CSV
+            let csvContent = "Nr;Datum;Eintrag;Zeichen;Typ\n";
+
+            // Zeilen hinzufügen
+            entries.forEach((e, index) => {
+                // Anführungszeichen werden verdoppelt, um CSV-Fehler zu vermeiden
+                let cleanEintrag = e.eintrag.replace(/"/g, '""');
+                csvContent += `${index + 1};${e.datum};"${cleanEintrag}";${e.zeichen};${e.typ}\n`;
+            });
+
+            // Download-Link erstellen
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "eintraege_export.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Zufalls-Anzeige
+        function displayRandom() {
+            const display = document.getElementById('randomDisplay');
+            if (entries.length === 0) {
+                display.innerText = "Keine Einträge vorhanden.";
+                return;
+            }
+            const randIndex = Math.floor(Math.random() * entries.length);
+            display.innerText = entries[randIndex].eintrag;
+        }
+    </script>
+</body>
+</html>
