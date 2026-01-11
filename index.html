@@ -2,159 +2,240 @@
 <html lang="de-CH">
 <head>
     <meta charset="UTF-8">
-    <title>Wort-Erfassungs-App v2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Wort-Sammler Pro</title>
+    
+    <link rel="icon" type="image/png" href="https://img.icons8.com/ios-filled/500/ffffff/note.png">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/ios-filled/500/ffffff/note.png">
+    <meta name="theme-color" content="#121212">
+    <link rel="manifest" href="manifest.json">
+
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; background-color: #f4f4f4; }
-        .hidden { display: none; }
-        .screen { background: white; border: 1px solid #ccc; padding: 20px; border-radius: 8px; max-width: 800px; margin: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        button { margin: 5px; cursor: pointer; padding: 10px 15px; border-radius: 4px; border: 1px solid #ddd; background: #eee; }
-        button:hover { background: #ddd; }
-        .btn-delete { background: #ffcccc; color: #a00; }
-        .btn-save { background: #ccffcc; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #f8f8f8; }
-        textarea { width: 100%; padding: 10px; box-sizing: border-box; border-radius: 4px; border: 1px solid #ccc; }
+        /* --- DARK MODE PIXEL STYLE CSS --- */
+        :root {
+            --bg-color: #121212; /* Tiefschwarz */
+            --surface-color: #1E1E1E; /* Dunkelgrau für Karten */
+            --text-primary: #E8EAED; /* Fast Weiss für Text */
+            --text-secondary: #A0A0A0; /* Hellgrau für weniger Wichtiges */
+            --primary-color: #8AB4F8; /* Google Pixel Blau für Akzente */
+            --danger-color: #F28B82; /* Helles Rot für Löschen */
+            --border-color: #333333;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif; /* Standard Android Schriftart */
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 16px;
+            line-height: 1.5;
+            /* Verhindert "Gummiband"-Effekt beim Scrollen auf iOS */
+            overscroll-behavior-y: none; 
+        }
+
+        h1, h2 { text-align: center; font-weight: 300; }
+        h1 { margin-bottom: 30px; color: var(--primary-color); }
+
+        .hidden { display: none !important; }
+
+        /* Container im Karten-Design */
+        .screen {
+            background: var(--surface-color);
+            padding: 24px;
+            border-radius: 24px; /* Starke Rundung wie bei modernen Apps */
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* Buttons im modernen "Pillen"-Design */
+        button {
+            width: 100%;
+            margin: 8px 0;
+            cursor: pointer;
+            padding: 14px;
+            border-radius: 50px;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            background-color: var(--surface-color);
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            transition: all 0.2s;
+        }
+
+        /* Hauptaktionen hervorgehoben */
+        button.primary-btn {
+            background-color: var(--primary-color);
+            color: var(--bg-color);
+            font-weight: bold;
+        }
+
+        button:active { transform: scale(0.98); opacity: 0.9; }
+        
+        /* Spezielle Buttons */
+        .btn-delete { 
+            background-color: transparent; 
+            border: 1px solid var(--danger-color); 
+            color: var(--danger-color); 
+            padding: 8px; font-size: 14px; 
+        }
+        .btn-back { border-color: var(--text-secondary); color: var(--text-secondary); }
+
+        /* Eingabefeld */
+        textarea {
+            width: 100%; padding: 16px; box-sizing: border-box;
+            border-radius: 16px; border: 1px solid var(--border-color);
+            background-color: #2C2C2C; color: var(--text-primary);
+            font-size: 16px; resize: none; margin-bottom: 16px;
+        }
+        textarea:focus { outline: none; border-color: var(--primary-color); }
+
+        /* Tabelle */
+        .table-container { overflow-x: auto; } /* Scrollbar auf kleinen Handys */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th, td { border-bottom: 1px solid var(--border-color); padding: 12px 8px; text-align: left; }
+        th { color: var(--primary-color); font-weight: 500; }
+        tr:last-child td { border-bottom: none; }
+
+        /* Random Anzeige */
+        #randomDisplay {
+            font-size: 1.8em; font-weight: 300; text-align: center;
+            min-height: 80px; padding: 30px;
+            border-radius: 16px; background-color: #2C2C2C;
+            display: flex; align-items: center; justify-content: center;
+        }
     </style>
 </head>
 <body>
 
     <div id="home" class="screen">
-        <h1>Wort-Manager</h1>
-        <button onclick="showScreen('erfassen')">Erfassen von Wörtern oder Sätzen</button><br>
-        <button onclick="showScreen('ansehen')">Einträge ansehen</button><br>
-        <button onclick="showScreen('random')">Random</button>
+        <h1>Wort-Sammler</h1>
+        <button class="primary-btn" onclick="showScreen('erfassen')">Neu erfassen (+)</button>
+        <button onclick="showScreen('ansehen')">Einträge ansehen</button>
+        <button onclick="showScreen('random')">Zufallseintrag</button>
     </div>
 
     <div id="erfassen" class="screen hidden">
-        <h2>Neu erfassen</h2>
-        <textarea id="inputField" rows="4" placeholder="Hier tippen..."></textarea><br>
-        <button class="btn-save" onclick="saveEntry('Wort')">Senden Wort</button>
-        <button class="btn-save" onclick="saveEntry('Satz')">Senden Satz</button>
-        <button onclick="showScreen('home')">Zurück</button>
+        <h2>Neuer Eintrag</h2>
+        <textarea id="inputField" rows="5" placeholder="Tippen Sie hier Ihr Wort oder Ihren Satz..."></textarea>
+        <button class="primary-btn" onclick="saveEntry('Wort')">Als Wort speichern</button>
+        <button class="primary-btn" onclick="saveEntry('Satz')">Als Satz speichern</button>
+        <button class="btn-back" onclick="showScreen('home')">Zurück zur Übersicht</button>
     </div>
 
     <div id="ansehen" class="screen hidden">
         <h2>Alle Einträge</h2>
-        <button onclick="exportCSV()">CSV Export (Excel)</button>
-        <button onclick="showScreen('home')">Zurück</button>
-        <div id="tableContainer"></div>
+        <button onclick="exportCSV()" style="margin-bottom: 20px;">Liste als Excel (CSV) laden</button>
+        <div id="tableContainer" class="table-container"></div>
+        <button class="btn-back" style="margin-top: 20px;" onclick="showScreen('home')">Zurück</button>
     </div>
 
     <div id="random" class="screen hidden">
-        <h2>Zufälliger Eintrag</h2>
-        <p id="randomDisplay" style="font-size: 1.5em; min-height: 50px; padding: 20px; border: 1px dashed #ccc;"></p>
-        <button onclick="displayRandom()">Next</button>
-        <button onclick="showScreen('home')">Back</button>
+        <h2>Zufall</h2>
+        <div id="randomDisplay"></div>
+        <button class="primary-btn" onclick="displayRandom()">Nächster (Next)</button>
+        <button class="btn-back" onclick="showScreen('home')">Zurück (Back)</button>
     </div>
 
     <script>
-        // Daten aus dem Speicher laden oder leeres Array erstellen
-        let entries = JSON.parse(localStorage.getItem('entries')) || [];
+        // PWA Service Worker Registrierung (vorbereitet für später)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
 
-        // Navigation zwischen den Seiten
+        // --- APP LOGIK ---
+        let entries = JSON.parse(localStorage.getItem('entries_v2')) || [];
+
         function showScreen(screenId) {
+            window.scrollTo(0,0); // Nach oben scrollen beim Wechsel
             document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
             document.getElementById(screenId).classList.remove('hidden');
             if (screenId === 'ansehen') renderTable();
             if (screenId === 'random') displayRandom();
         }
 
-        // Speichern eines neuen Eintrags
         function saveEntry(type) {
             const content = document.getElementById('inputField').value.trim();
             if (!content) {
-                alert("Bitte Text eingeben!");
-                return;
+                alert("Bitte zuerst Text eingeben."); return;
             }
 
             const entry = {
-                datum: new Date().toLocaleString('de-CH'),
+                id: Date.now(), // Eindeutige ID basierend auf Zeitstempel
+                datum: new Date().toLocaleDateString('de-CH', {day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit'}),
                 eintrag: content,
                 zeichen: content.length,
                 typ: type
             };
 
-            entries.push(entry);
+            entries.unshift(entry); // Neuen Eintrag AM ANFANG hinzufügen
             saveToLocalStorage();
             document.getElementById('inputField').value = '';
-            alert('Eintrag gespeichert!');
+            // Optional: kurzes visuelles Feedback statt nervigem Alert
+            showScreen('home');
         }
 
-        // Daten dauerhaft im Browser speichern
         function saveToLocalStorage() {
-            localStorage.setItem('entries', JSON.stringify(entries));
+            localStorage.setItem('entries_v2', JSON.stringify(entries));
         }
 
-        // Tabelle anzeigen inklusive Lösch-Button
         function renderTable() {
             if (entries.length === 0) {
-                document.getElementById('tableContainer').innerHTML = "<p>Keine Einträge vorhanden.</p>";
+                document.getElementById('tableContainer').innerHTML = "<p style='text-align:center; color:var(--text-secondary);'>Noch keine Einträge vorhanden.</p>";
                 return;
             }
 
-            let html = '<table><tr><th>Nr.</th><th>Datum</th><th>Eintrag</th><th>Zeichen</th><th>Typ</th><th>Aktion</th></tr>';
+            let html = '<table><tr><th>Datum</th><th>Eintrag</th><th>Typ</th><th></th></tr>';
             entries.forEach((e, index) => {
+                // Eintrag kürzen für die Übersicht, falls zu lang
+                let shortEntry = e.eintrag.length > 30 ? e.eintrag.substring(0, 30) + "..." : e.eintrag;
                 html += `<tr>
-                    <td>${index + 1}</td>
-                    <td>${e.datum}</td>
-                    <td>${e.eintrag}</td>
-                    <td>${e.zeichen}</td>
-                    <td>${e.typ}</td>
-                    <td><button class="btn-delete" onclick="deleteEntry(${index})">Löschen</button></td>
+                    <td style="font-size:0.8em; color:var(--text-secondary);">${e.datum}</td>
+                    <td><strong>${shortEntry}</strong></td>
+                    <td style="font-size:0.8em;">${e.typ}</td>
+                    <td style="text-align:right;"><button class="btn-delete" onclick="deleteEntry(${index})">X</button></td>
                 </tr>`;
             });
             html += '</table>';
             document.getElementById('tableContainer').innerHTML = html;
         }
 
-        // Einzelnen Eintrag löschen
         function deleteEntry(index) {
-            if (confirm("Möchten Sie diesen Eintrag wirklich löschen?")) {
+            // Kurze Bestätigung per Vibration (nur auf Android)
+            if (navigator.vibrate) navigator.vibrate(50); 
+            if (confirm("Diesen Eintrag wirklich löschen?")) {
                 entries.splice(index, 1);
                 saveToLocalStorage();
                 renderTable();
             }
         }
 
-        // CSV Export Funktion
         function exportCSV() {
-            if (entries.length === 0) {
-                alert("Keine Daten zum Exportieren vorhanden.");
-                return;
-            }
-
-            // Kopfzeile der CSV
-            let csvContent = "Nr;Datum;Eintrag;Zeichen;Typ\n";
-
-            // Zeilen hinzufügen
-            entries.forEach((e, index) => {
-                // Anführungszeichen werden verdoppelt, um CSV-Fehler zu vermeiden
-                let cleanEintrag = e.eintrag.replace(/"/g, '""');
-                csvContent += `${index + 1};${e.datum};"${cleanEintrag}";${e.zeichen};${e.typ}\n`;
+            if (entries.length === 0) { alert("Nichts zum Exportieren."); return; }
+            let csvContent = "Datum;Eintrag;Zeichen;Typ\n";
+            entries.forEach(e => {
+                let cleanEintrag = e.eintrag.replace(/"/g, '""').replace(/;/g, ','); // Semikolons im Text entfernen
+                csvContent += `${e.datum};"${cleanEintrag}";${e.zeichen};${e.typ}\n`;
             });
-
-            // Download-Link erstellen
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute("download", "eintraege_export.csv");
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            link.href = url;
+            link.download = "wort_sammlung_" + new Date().toISOString().slice(0,10) + ".csv";
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
 
-        // Zufalls-Anzeige
         function displayRandom() {
             const display = document.getElementById('randomDisplay');
             if (entries.length === 0) {
-                display.innerText = "Keine Einträge vorhanden.";
+                display.innerText = "Liste leer.";
+                display.style.color = "var(--text-secondary)";
                 return;
             }
             const randIndex = Math.floor(Math.random() * entries.length);
             display.innerText = entries[randIndex].eintrag;
+            display.style.color = "var(--text-primary)";
         }
     </script>
 </body>
