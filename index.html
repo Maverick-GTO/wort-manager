@@ -5,105 +5,109 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Wort-Sammler Pro</title>
     
-    <link rel="icon" type="image/png" href="https://img.icons8.com/ios-filled/500/ffffff/note.png">
-    <link rel="apple-touch-icon" href="https://img.icons8.com/ios-filled/500/ffffff/note.png">
-    <meta name="theme-color" content="#121212">
     <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#121212">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23121212'/><text x='50%' y='50%' dominant-baseline='central' text-anchor='middle' font-family='sans-serif' font-size='60' fill='%238AB4F8'>W</text></svg>">
 
     <style>
-        /* --- DARK MODE PIXEL STYLE CSS --- */
+        /* GOOGLE PIXEL DARK THEME (Material You) */
         :root {
-            --bg-color: #121212; /* Tiefschwarz */
-            --surface-color: #1E1E1E; /* Dunkelgrau für Karten */
-            --text-primary: #E8EAED; /* Fast Weiss für Text */
-            --text-secondary: #A0A0A0; /* Hellgrau für weniger Wichtiges */
-            --primary-color: #8AB4F8; /* Google Pixel Blau für Akzente */
-            --danger-color: #F28B82; /* Helles Rot für Löschen */
-            --border-color: #333333;
+            --bg-color: #121212;
+            --surface: #1E1E1E;
+            --primary: #8AB4F8; /* Pixel Blue */
+            --on-primary: #003063;
+            --text-main: #E2E2E2;
+            --text-sub: #909090;
+            --danger: #F28B82;
+            --accent: #D2E3FC;
         }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: 'Roboto', sans-serif; /* Standard Android Schriftart */
+            font-family: 'Roboto', 'Segoe UI', sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-primary);
+            color: var(--text-main);
             margin: 0;
-            padding: 16px;
-            line-height: 1.5;
-            /* Verhindert "Gummiband"-Effekt beim Scrollen auf iOS */
-            overscroll-behavior-y: none; 
+            padding: env(safe-area-inset-top) 16px 16px 16px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
-        h1, h2 { text-align: center; font-weight: 300; }
-        h1 { margin-bottom: 30px; color: var(--primary-color); }
-
-        .hidden { display: none !important; }
-
-        /* Container im Karten-Design */
         .screen {
-            background: var(--surface-color);
-            padding: 24px;
-            border-radius: 24px; /* Starke Rundung wie bei modernen Apps */
-            max-width: 600px;
-            margin: auto;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            background: var(--surface);
+            padding: 28px;
+            border-radius: 32px;
+            max-width: 500px;
+            margin: 20px auto;
+            width: 100%;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
         }
 
-        /* Buttons im modernen "Pillen"-Design */
+        h1 { font-size: 24px; font-weight: 400; text-align: center; color: var(--primary); margin-bottom: 32px; }
+        h2 { font-size: 20px; font-weight: 400; margin-bottom: 20px; }
+
         button {
             width: 100%;
+            padding: 16px;
             margin: 8px 0;
-            cursor: pointer;
-            padding: 14px;
-            border-radius: 50px;
+            border-radius: 100px; /* Voll abgerundet wie Pixel-Buttons */
             border: none;
             font-size: 16px;
             font-weight: 500;
-            background-color: var(--surface-color);
-            color: var(--primary-color);
-            border: 1px solid var(--primary-color);
-            transition: all 0.2s;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
         }
 
-        /* Hauptaktionen hervorgehoben */
-        button.primary-btn {
-            background-color: var(--primary-color);
-            color: var(--bg-color);
-            font-weight: bold;
-        }
+        .btn-primary { background-color: var(--primary); color: var(--on-primary); }
+        .btn-outline { background-color: transparent; border: 1px solid var(--text-sub); color: var(--text-main); }
+        .btn-delete { background: none; color: var(--danger); border: 1px solid var(--danger); width: auto; padding: 6px 12px; font-size: 12px; }
 
-        button:active { transform: scale(0.98); opacity: 0.9; }
-        
-        /* Spezielle Buttons */
-        .btn-delete { 
-            background-color: transparent; 
-            border: 1px solid var(--danger-color); 
-            color: var(--danger-color); 
-            padding: 8px; font-size: 14px; 
-        }
-        .btn-back { border-color: var(--text-secondary); color: var(--text-secondary); }
+        button:active { transform: scale(0.97); opacity: 0.8; }
 
-        /* Eingabefeld */
         textarea {
-            width: 100%; padding: 16px; box-sizing: border-box;
-            border-radius: 16px; border: 1px solid var(--border-color);
-            background-color: #2C2C2C; color: var(--text-primary);
-            font-size: 16px; resize: none; margin-bottom: 16px;
+            width: 100%;
+            background: #2C2C2C;
+            border: 2px solid transparent;
+            border-radius: 20px;
+            padding: 16px;
+            color: white;
+            font-size: 16px;
+            margin-bottom: 16px;
+            outline: none;
         }
-        textarea:focus { outline: none; border-color: var(--primary-color); }
 
-        /* Tabelle */
-        .table-container { overflow-x: auto; } /* Scrollbar auf kleinen Handys */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
-        th, td { border-bottom: 1px solid var(--border-color); padding: 12px 8px; text-align: left; }
-        th { color: var(--primary-color); font-weight: 500; }
-        tr:last-child td { border-bottom: none; }
+        textarea:focus { border-color: var(--primary); }
 
-        /* Random Anzeige */
+        .hidden { display: none !important; }
+
+        /* Listen-Design */
+        .entry-card {
+            border-bottom: 1px solid #333;
+            padding: 16px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .entry-info { display: flex; flex-direction: column; gap: 4px; }
+        .entry-text { font-weight: 500; font-size: 16px; }
+        .entry-meta { font-size: 12px; color: var(--text-sub); }
+
         #randomDisplay {
-            font-size: 1.8em; font-weight: 300; text-align: center;
-            min-height: 80px; padding: 30px;
-            border-radius: 16px; background-color: #2C2C2C;
-            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            text-align: center;
+            padding: 40px 20px;
+            background: #2C2C2C;
+            border-radius: 24px;
+            margin-bottom: 24px;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
@@ -111,132 +115,92 @@
 
     <div id="home" class="screen">
         <h1>Wort-Sammler</h1>
-        <button class="primary-btn" onclick="showScreen('erfassen')">Neu erfassen (+)</button>
-        <button onclick="showScreen('ansehen')">Einträge ansehen</button>
-        <button onclick="showScreen('random')">Zufallseintrag</button>
+        <button class="btn-primary" onclick="showScreen('erfassen')">Neu erfassen</button>
+        <button class="btn-outline" onclick="showScreen('ansehen')">Alle Einträge</button>
+        <button class="btn-outline" onclick="showScreen('random')">Zufall</button>
     </div>
 
     <div id="erfassen" class="screen hidden">
-        <h2>Neuer Eintrag</h2>
-        <textarea id="inputField" rows="5" placeholder="Tippen Sie hier Ihr Wort oder Ihren Satz..."></textarea>
-        <button class="primary-btn" onclick="saveEntry('Wort')">Als Wort speichern</button>
-        <button class="primary-btn" onclick="saveEntry('Satz')">Als Satz speichern</button>
-        <button class="btn-back" onclick="showScreen('home')">Zurück zur Übersicht</button>
+        <h2>Eintrag schreiben</h2>
+        <textarea id="inputField" rows="5" placeholder="Satz oder Wort..."></textarea>
+        <button class="btn-primary" onclick="saveEntry('Wort')">Als Wort senden</button>
+        <button class="btn-primary" onclick="saveEntry('Satz')">Als Satz senden</button>
+        <button class="btn-outline" onclick="showScreen('home')">Zurück</button>
     </div>
 
     <div id="ansehen" class="screen hidden">
-        <h2>Alle Einträge</h2>
-        <button onclick="exportCSV()" style="margin-bottom: 20px;">Liste als Excel (CSV) laden</button>
-        <div id="tableContainer" class="table-container"></div>
-        <button class="btn-back" style="margin-top: 20px;" onclick="showScreen('home')">Zurück</button>
+        <h2>Sammlung</h2>
+        <button class="btn-outline" onclick="exportCSV()" style="font-size:14px; padding:10px;">CSV Export</button>
+        <div id="listContainer"></div>
+        <button class="btn-outline" onclick="showScreen('home')" style="margin-top:20px;">Zurück</button>
     </div>
 
     <div id="random" class="screen hidden">
         <h2>Zufall</h2>
         <div id="randomDisplay"></div>
-        <button class="primary-btn" onclick="displayRandom()">Nächster (Next)</button>
-        <button class="btn-back" onclick="showScreen('home')">Zurück (Back)</button>
+        <button class="btn-primary" onclick="displayRandom()">Nächster</button>
+        <button class="btn-outline" onclick="showScreen('home')">Zurück</button>
     </div>
 
     <script>
-        // PWA Service Worker Registrierung (vorbereitet für später)
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(() => {});
-        }
+        let entries = JSON.parse(localStorage.getItem('pixel_words')) || [];
 
-        // --- APP LOGIK ---
-        let entries = JSON.parse(localStorage.getItem('entries_v2')) || [];
-
-        function showScreen(screenId) {
-            window.scrollTo(0,0); // Nach oben scrollen beim Wechsel
+        function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-            document.getElementById(screenId).classList.remove('hidden');
-            if (screenId === 'ansehen') renderTable();
-            if (screenId === 'random') displayRandom();
+            document.getElementById(id).classList.remove('hidden');
+            if(id === 'ansehen') renderList();
+            if(id === 'random') displayRandom();
         }
 
         function saveEntry(type) {
-            const content = document.getElementById('inputField').value.trim();
-            if (!content) {
-                alert("Bitte zuerst Text eingeben."); return;
-            }
-
+            const val = document.getElementById('inputField').value.trim();
+            if(!val) return;
             const entry = {
-                id: Date.now(), // Eindeutige ID basierend auf Zeitstempel
-                datum: new Date().toLocaleDateString('de-CH', {day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit'}),
-                eintrag: content,
-                zeichen: content.length,
-                typ: type
+                id: Date.now(),
+                text: val,
+                date: new Date().toLocaleDateString('de-CH'),
+                chars: val.length,
+                type: type
             };
-
-            entries.unshift(entry); // Neuen Eintrag AM ANFANG hinzufügen
-            saveToLocalStorage();
+            entries.unshift(entry);
+            localStorage.setItem('pixel_words', JSON.stringify(entries));
             document.getElementById('inputField').value = '';
-            // Optional: kurzes visuelles Feedback statt nervigem Alert
             showScreen('home');
         }
 
-        function saveToLocalStorage() {
-            localStorage.setItem('entries_v2', JSON.stringify(entries));
+        function renderList() {
+            const container = document.getElementById('listContainer');
+            if(entries.length === 0) { container.innerHTML = "<p>Leer.</p>"; return; }
+            container.innerHTML = entries.map((e, i) => `
+                <div class="entry-card">
+                    <div class="entry-info">
+                        <span class="entry-text">${e.text}</span>
+                        <span class="entry-meta">${e.date} • ${e.chars} Zeichen • ${e.type}</span>
+                    </div>
+                    <button class="btn-delete" onclick="deleteEntry(${i})">Löschen</button>
+                </div>
+            `).join('');
         }
 
-        function renderTable() {
-            if (entries.length === 0) {
-                document.getElementById('tableContainer').innerHTML = "<p style='text-align:center; color:var(--text-secondary);'>Noch keine Einträge vorhanden.</p>";
-                return;
-            }
-
-            let html = '<table><tr><th>Datum</th><th>Eintrag</th><th>Typ</th><th></th></tr>';
-            entries.forEach((e, index) => {
-                // Eintrag kürzen für die Übersicht, falls zu lang
-                let shortEntry = e.eintrag.length > 30 ? e.eintrag.substring(0, 30) + "..." : e.eintrag;
-                html += `<tr>
-                    <td style="font-size:0.8em; color:var(--text-secondary);">${e.datum}</td>
-                    <td><strong>${shortEntry}</strong></td>
-                    <td style="font-size:0.8em;">${e.typ}</td>
-                    <td style="text-align:right;"><button class="btn-delete" onclick="deleteEntry(${index})">X</button></td>
-                </tr>`;
-            });
-            html += '</table>';
-            document.getElementById('tableContainer').innerHTML = html;
-        }
-
-        function deleteEntry(index) {
-            // Kurze Bestätigung per Vibration (nur auf Android)
-            if (navigator.vibrate) navigator.vibrate(50); 
-            if (confirm("Diesen Eintrag wirklich löschen?")) {
-                entries.splice(index, 1);
-                saveToLocalStorage();
-                renderTable();
-            }
-        }
-
-        function exportCSV() {
-            if (entries.length === 0) { alert("Nichts zum Exportieren."); return; }
-            let csvContent = "Datum;Eintrag;Zeichen;Typ\n";
-            entries.forEach(e => {
-                let cleanEintrag = e.eintrag.replace(/"/g, '""').replace(/;/g, ','); // Semikolons im Text entfernen
-                csvContent += `${e.datum};"${cleanEintrag}";${e.zeichen};${e.typ}\n`;
-            });
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = "wort_sammlung_" + new Date().toISOString().slice(0,10) + ".csv";
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        function deleteEntry(i) {
+            if(confirm("Löschen?")) { entries.splice(i, 1); localStorage.setItem('pixel_words', JSON.stringify(entries)); renderList(); }
         }
 
         function displayRandom() {
-            const display = document.getElementById('randomDisplay');
-            if (entries.length === 0) {
-                display.innerText = "Liste leer.";
-                display.style.color = "var(--text-secondary)";
-                return;
-            }
-            const randIndex = Math.floor(Math.random() * entries.length);
-            display.innerText = entries[randIndex].eintrag;
-            display.style.color = "var(--text-primary)";
+            const box = document.getElementById('randomDisplay');
+            if(entries.length === 0) { box.innerText = "Keine Einträge"; return; }
+            box.innerText = entries[Math.floor(Math.random() * entries.length)].text;
         }
+
+        function exportCSV() {
+            let csv = "Datum;Eintrag;Typ\n" + entries.map(e => `${e.date};"${e.text}";${e.type}`).join("\n");
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url; a.download = "export.csv"; a.click();
+        }
+
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
     </script>
 </body>
 </html>
